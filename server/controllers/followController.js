@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Follow, User } = require('../models');
+const { Follow, User, Notification } = require('../models');
 
 const followUser = async (req, res, next) => {
   try {
@@ -24,6 +24,7 @@ const followUser = async (req, res, next) => {
     await Promise.all([
       User.updateOne({ _id: followerId }, { $inc: { followingCount: 1 } }),
       User.updateOne({ _id: followingId }, { $inc: { followersCount: 1 } }),
+      Notification.create({ recipientId: followingId, actorId: followerId, type: 'follow' }),
     ]);
 
     res.status(201).json({ message: 'Followed successfully' });

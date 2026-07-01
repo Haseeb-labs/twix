@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
-const { Tweet, Follow } = require('../models');
+const { Tweet, Follow, Notification } = require('../models');
+const calculateScore = require('../utils/calculateScore');
 
 const AUTHOR_FIELDS = 'username handle avatarUrl';
 
 const createTweet = async (req, res, next) => {
   try {
-    const { text } = req.body;
+    const { text, parentTweetId } = req.body;
 
     if (!text || !text.trim()) {
       return res.status(400).json({ message: 'Tweet text is required' });
@@ -15,10 +16,41 @@ const createTweet = async (req, res, next) => {
       return res.status(400).json({ message: 'Tweet text must be 280 characters or fewer' });
     }
 
+    let parent = null;
+    if (parentTweetId) {
+      if (!mongoose.Types.ObjectId.isValid(parentTweetId)) {
+        return res.status(404).json({ message: 'Parent tweet not found' });
+      }
+      parent = await Tweet.findById(parentTweetId);
+      if (!parent) {
+        return res.status(404).json({ message: 'Parent tweet not found' });
+      }
+    }
+
     const tweet = await Tweet.create({
       authorId: req.user._id,
       text,
+      parentTweetId: parent ? parent._id : null,
     });
+
+    if (parent) {
+      const updatedParent = await Tweet.findByIdAndUpdate(
+        parent._id,
+        { $inc: { repliesCount: 1 } },
+        { new: true }
+      );
+      const newScore = calculateScore(updatedParent);
+      await Tweet.updateOne({ _id: parent._id }, { $set: { score: newScore } });
+
+      if (parent.authorId.toString() !== req.user._id.toString()) {
+        await Notification.create({
+          recipientId: parent.authorId,
+          actorId: req.user._id,
+          type: 'reply',
+          tweetId: tweet._id,
+        });
+      }
+    }
 
     await tweet.populate('authorId', AUTHOR_FIELDS);
 
@@ -46,6 +78,18 @@ const deleteTweet = async (req, res, next) => {
     }
 
     await tweet.deleteOne();
+
+    if (tweet.parentTweetId) {
+      const updatedParent = await Tweet.findByIdAndUpdate(
+        tweet.parentTweetId,
+        { $inc: { repliesCount: -1 } },
+        { new: true }
+      );
+      if (updatedParent) {
+        const newScore = calculateScore(updatedParent);
+        await Tweet.updateOne({ _id: tweet.parentTweetId }, { $set: { score: newScore } });
+      }
+    }
 
     res.json({ message: 'Tweet deleted' });
   } catch (error) {
