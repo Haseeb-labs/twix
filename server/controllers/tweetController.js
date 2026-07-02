@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { Tweet, Follow, Notification } = require('../models');
 const calculateScore = require('../utils/calculateScore');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 const AUTHOR_FIELDS = 'username handle avatarUrl';
 
@@ -27,9 +28,15 @@ const createTweet = async (req, res, next) => {
       }
     }
 
+    let imageUrl = '';
+    if (req.file) {
+      imageUrl = await uploadToCloudinary(req.file.buffer);
+    }
+
     const tweet = await Tweet.create({
       authorId: req.user._id,
       text,
+      imageUrl,
       parentTweetId: parent ? parent._id : null,
     });
 
