@@ -5,6 +5,7 @@ const followRoutes = require('./follows');
 const likeRoutes = require('./likes');
 const retweetRoutes = require('./retweets');
 const notificationRoutes = require('./notifications');
+const searchRoutes = require('./search');
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.use('/follows', followRoutes);
 router.use('/likes', likeRoutes);
 router.use('/retweets', retweetRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/search', searchRoutes);
 
 module.exports = router;
