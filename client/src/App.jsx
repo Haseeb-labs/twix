@@ -1,0 +1,72 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+
+function GuestRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user ? <Navigate to="/" replace /> : children;
+}
+
+function Placeholder({ label }) {
+  return (
+    <div className="flex items-center justify-center min-h-screen text-gray-500">
+      {label} — coming soon
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <GuestRoute>
+              <LoginPage />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <GuestRoute>
+              <RegisterPage />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Placeholder label="Home feed" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/explore"
+          element={<Placeholder label="Explore" />}
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Placeholder label="Notifications" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tweet/:id"
+          element={<Placeholder label="Tweet detail" />}
+        />
+        <Route
+          path="/:handle"
+          element={<Placeholder label="Profile" />}
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
