@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import HomePage from './pages/HomePage';
 
 function GuestRoute({ children }) {
   const { user, loading } = useAuth();
@@ -42,7 +43,7 @@ export default function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <Placeholder label="Home feed" />
+              <HomePage />
             </ProtectedRoute>
           }
         />
