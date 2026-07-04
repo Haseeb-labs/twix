@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+import ProfilePage from './pages/ProfilePage';
 
 function GuestRoute({ children }) {
   const { user, loading } = useAuth();
@@ -65,7 +66,7 @@ export default function App() {
         />
         <Route
           path="/:handle"
-          element={<Placeholder label="Profile" />}
+          element={<ProfilePage />}
         />
       </Routes>
     </BrowserRouter>
