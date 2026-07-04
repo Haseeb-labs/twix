@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
+import ExplorePage from './pages/ExplorePage';
 
 function GuestRoute({ children }) {
   const { user, loading } = useAuth();
@@ -50,7 +51,7 @@ export default function App() {
         />
         <Route
           path="/explore"
-          element={<Placeholder label="Explore" />}
+          element={<ExplorePage />}
         />
         <Route
           path="/notifications"

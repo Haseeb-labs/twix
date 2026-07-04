@@ -1,4 +1,4 @@
-const { Tweet, User } = require('../models');
+const { Tweet, User, Follow } = require('../models');
 
 const USER_FIELDS = 'username handle avatarUrl bio followersCount followingCount';
 
@@ -21,7 +21,22 @@ const search = async (req, res, next) => {
         .limit(20),
     ]);
 
-    res.json({ tweets, users });
+    let userResults = users.map((u) => ({ ...u.toObject(), isFollowing: false }));
+
+    if (req.user && users.length > 0) {
+      const follows = await Follow.find({
+        followerId: req.user._id,
+        followingId: { $in: users.map((u) => u._id) },
+      }).select('followingId');
+
+      const followingSet = new Set(follows.map((f) => f.followingId.toString()));
+      userResults = users.map((u) => ({
+        ...u.toObject(),
+        isFollowing: followingSet.has(u._id.toString()),
+      }));
+    }
+
+    res.json({ tweets, users: userResults });
   } catch (error) {
     next(error);
   }
