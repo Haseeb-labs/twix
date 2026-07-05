@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import ExplorePage from './pages/ExplorePage';
 import NotificationsPage from './pages/NotificationsPage';
+import TweetDetailPage from './pages/TweetDetailPage';
 
 function GuestRoute({ children }) {
   const { user, loading } = useAuth();
@@ -64,7 +65,7 @@ export default function App() {
         />
         <Route
           path="/tweet/:id"
-          element={<Placeholder label="Tweet detail" />}
+          element={<TweetDetailPage />}
         />
         <Route
           path="/:handle"
