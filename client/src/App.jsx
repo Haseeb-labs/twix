@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import ExplorePage from './pages/ExplorePage';
+import NotificationsPage from './pages/NotificationsPage';
 
 function GuestRoute({ children }) {
   const { user, loading } = useAuth();
@@ -57,7 +58,7 @@ export default function App() {
           path="/notifications"
           element={
             <ProtectedRoute>
-              <Placeholder label="Notifications" />
+              <NotificationsPage />
             </ProtectedRoute>
           }
         />
